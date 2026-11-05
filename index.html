@@ -86,7 +86,10 @@
       '<div class="meta">📅 ' + esc(FECHA) + '<br>📍 ' + esc(LUGAR) + '<br>🌅 Una boda frente al mar, al atardecer</div>';
   }
 
-  if (!D.codigo || !D.personas.length) {
+  var CERRADO = new Date() >= new Date('2026-12-16T00:00:00-05:00');
+  if (CERRADO) {
+    app.innerHTML = cabecera() + '<p class="sub" style="text-align:center">El plazo para confirmar terminó el 15 de diciembre. Si necesitas confirmar, escríbenos por WhatsApp 💛</p>';
+  } else if (!D.codigo || !D.personas.length) {
     app.innerHTML = cabecera() + '<p class="sub" style="text-align:center">Para confirmar, usa el link personal que te enviamos por WhatsApp 💛</p>';
   } else {
     var plural = D.personas.length > 1, previo = guardado(), sel = {};
