@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Save the Date · Paola & Nicolas</title>
+<meta property="og:title" content="¡Save the Date! · Paola & Nicolas">
+<meta property="og:description" content="17 de abril de 2027 · Playa El Francés, Tolú">
+<meta property="og:image" content="portada.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+  // ====== REEMPLAZA ESTE BLOQUE CON EL QUE TE MUESTRA "💍 Boda → 3. Datos para la página" ======
+  var CONFIG = {
+    formAction:  'PEGAR',
+    eCodigo:     'PEGAR',
+    eInvitacion: 'PEGAR',
+    eAsistencia: 'PEGAR',
+    eQuienes:    'PEGAR',
+    eMensaje:    'PEGAR'
+  };
+</script>
+<style>
+  :root{--arena:#FFF6D6;--mar:#1F4E79;--texto:#1d2733;--suave:#5F6B7A;--blanco:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'DM Sans',system-ui,sans-serif;color:var(--texto);
+    background:linear-gradient(180deg,#9CC9EC 0%,#CFE6F5 38%,var(--arena) 100%);min-height:100vh;padding:20px 16px 40px}
+  .card{max-width:440px;margin:0 auto;background:rgba(255,255,255,.94);border-radius:22px;overflow:hidden;
+    box-shadow:0 12px 40px rgba(31,78,121,.18)}
+  .video{position:relative;background:#000;aspect-ratio:9/16;max-height:72vh;margin:0 auto}
+  .video video{width:100%;height:100%;object-fit:cover;display:block}
+  .sonido{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);border:0;border-radius:999px;
+    background:rgba(0,0,0,.6);color:#fff;padding:10px 16px;white-space:nowrap;font:600 14px 'DM Sans',sans-serif;cursor:pointer}
+  .cuerpo{padding:24px 22px 26px}
+  h1{font-family:'Anton',sans-serif;font-weight:400;font-size:44px;line-height:1;margin:0;text-align:center;
+    color:#D9A90F;text-shadow:0 2px 0 rgba(31,78,121,.35)}
+  .novios{font-family:'Anton',sans-serif;text-align:center;color:var(--mar);font-size:22px;letter-spacing:2px;margin:10px 0 2px}
+  .meta{text-align:center;color:var(--suave);font-size:15px;line-height:1.6;margin-bottom:18px}
+  .hola{font-size:18px;margin:6px 0 6px}
+  .sub{color:var(--suave);font-size:14px;margin:0 0 16px}
+  .cupo{display:inline-block;background:var(--mar);color:#fff;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700;margin:2px 0 12px}
+  .persona{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;margin-bottom:10px;
+    border:2px solid #E3E8EE;border-radius:14px;background:var(--blanco)}
+  .persona .nom{font-weight:700;font-size:16px}
+  .toggle{display:flex;border-radius:999px;background:#EEF2F6;padding:3px;flex-shrink:0}
+  .toggle button{border:0;background:transparent;padding:8px 12px;border-radius:999px;font:500 14px 'DM Sans',sans-serif;color:var(--suave);cursor:pointer}
+  .toggle button.si.on{background:#2E9D5B;color:#fff}
+  .toggle button.no.on{background:#C9483B;color:#fff}
+  textarea{width:100%;min-height:80px;border:2px solid #E3E8EE;border-radius:14px;padding:12px;font:15px 'DM Sans',sans-serif;resize:vertical}
+  label.l{display:block;font-weight:700;margin:16px 0 6px;font-size:14px}
+  .btn{width:100%;margin-top:18px;padding:15px;border:0;border-radius:14px;background:var(--mar);color:#fff;
+    font:700 17px 'DM Sans',sans-serif;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .nota{background:var(--arena);border-radius:14px;padding:12px 14px;font-size:14px;color:#6b5600;margin-top:16px;text-align:center}
+  .err{color:#C9483B;font-size:14px;margin-top:10px;text-align:center}
+  .gracias{text-align:center}
+  .gracias .big{font-size:52px;margin:6px 0}
+  .ya{font-size:13px;color:var(--suave);background:#EEF2F6;border-radius:10px;padding:8px 12px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="video">
+    <video id="vid" src="video.mp4" poster="portada.jpg" autoplay muted loop playsinline></video>
+    <button class="sonido" id="sonido" type="button">🔊 Toca para escuchar</button>
+  </div>
+  <div class="cuerpo" id="app"></div>
+</div>
+<script>
+  var NOVIOS = 'Paola & Nicolas', FECHA = 'Sábado 17 de abril de 2027', LUGAR = 'Playa El Francés, Tolú', LIMITE = '15 de diciembre de 2026';
+  // Deben coincidir exactamente con las opciones del formulario (OPC_* en Apps Script)
+  var OPC_TODOS = '¡Sí, confirmo! 🎉', OPC_ALGUNOS = 'Solo asistirán algunas personas de la invitación', OPC_NO = 'No podré / no podremos asistir 😢';
+
+  var vid = document.getElementById('vid'), btnSon = document.getElementById('sonido');
+  btnSon.onclick = function(){ vid.muted = false; vid.currentTime = 0; vid.play(); btnSon.style.display = 'none'; };
+
+  var q = new URLSearchParams(location.search);
+  var D = { codigo: (q.get('c') || '').trim(), saludo: (q.get('s') || '').trim(),
+            personas: (q.get('p') || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean) };
+  var app = document.getElementById('app');
+  function esc(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function guardado(){ try { return JSON.parse(localStorage.getItem('rsvp_' + D.codigo) || 'null'); } catch(e){ return null; } }
+  function guardar(v){ try { localStorage.setItem('rsvp_' + D.codigo, JSON.stringify(v)); } catch(e){} }
+  function unir(p){ return p.length > 1 ? p.slice(0, -1).join(', ') + ' y ' + p[p.length - 1] : (p[0] || ''); }
+  function cabecera(){
+    return '<h1>¡SAVE THE DATE!</h1><div class="novios">' + esc(NOVIOS.toUpperCase()) + '</div>' +
+      '<div class="meta">📅 ' + esc(FECHA) + '<br>📍 ' + esc(LUGAR) + '<br>🌅 Una boda frente al mar, al atardecer</div>';
+  }
+
+  if (!D.codigo || !D.personas.length) {
+    app.innerHTML = cabecera() + '<p class="sub" style="text-align:center">Para confirmar, usa el link personal que te enviamos por WhatsApp 💛</p>';
+  } else {
+    var plural = D.personas.length > 1, previo = guardado(), sel = {};
+    D.personas.forEach(function(p){ sel[p] = previo ? previo.indexOf(p) !== -1 : true; });
+
+    function pintar(){
+      var msgActual = document.getElementById('msg') ? document.getElementById('msg').value : '';
+      var h = cabecera();
+      h += '<p class="hola">¡Hola, <b>' + esc(D.saludo || unir(D.personas)) + '</b>! 💛</p>';
+      h += '<div class="cupo">🎟️ Válida para ' + D.personas.length + (plural ? ' personas' : ' persona') + '</div>';
+      h += '<p class="sub">' + (plural ? 'Esta invitación es solo para las personas de esta lista. Cuéntennos quién nos acompaña:'
+                                       : 'Esta invitación es personal. ¿Nos acompañas?') + '</p>';
+      if (previo) h += '<div class="ya">Ya ' + (plural ? 'nos respondieron' : 'nos respondiste') + ' desde este celular. Si algo cambió, puedes actualizar tu respuesta.</div>';
+      D.personas.forEach(function(p, i){
+        h += '<div class="persona"><span class="nom">' + esc(p) + '</span><div class="toggle">' +
+          '<button type="button" class="si' + (sel[p] ? ' on' : '') + '" data-i="' + i + '" data-v="1">Asistirá</button>' +
+          '<button type="button" class="no' + (!sel[p] ? ' on' : '') + '" data-i="' + i + '" data-v="0">No podrá</button></div></div>';
+      });
+      h += '<label class="l" for="msg">Mensaje para los novios (opcional)</label><textarea id="msg" maxlength="1000"></textarea>';
+      h += '<button class="btn" id="enviar">Confirmar</button><div class="err" id="err"></div>';
+      h += '<div class="nota">✉️ Más adelante ' + (plural ? 'recibirán' : 'recibirás') + ' la invitación formal con todos los detalles de la fiesta.<br>Confirma antes del ' + esc(LIMITE) + '.</div>';
+      app.innerHTML = h;
+      document.getElementById('msg').value = msgActual;
+      Array.prototype.forEach.call(app.querySelectorAll('.toggle button'), function(b){
+        b.onclick = function(){ sel[D.personas[+b.dataset.i]] = b.dataset.v === '1'; pintar(); };
+      });
+      document.getElementById('enviar').onclick = enviar;
+    }
+
+    function enviar(){
+      var btn = document.getElementById('enviar');
+      btn.disabled = true; btn.textContent = 'Enviando…';
+      var asisten = D.personas.filter(function(p){ return sel[p]; });
+      var opcion = asisten.length === 0 ? OPC_NO : (asisten.length === D.personas.length ? OPC_TODOS : OPC_ALGUNOS);
+      var datos = new URLSearchParams();
+      datos.append('entry.' + CONFIG.eCodigo, D.codigo);
+      datos.append('entry.' + CONFIG.eInvitacion, (D.saludo || '') + ' · Válida para ' + D.personas.length + (plural ? ' personas: ' : ' persona: ') + unir(D.personas));
+      datos.append('entry.' + CONFIG.eAsistencia, opcion);
+      if (opcion === OPC_ALGUNOS) datos.append('entry.' + CONFIG.eQuienes, asisten.join(', '));
+      datos.append('entry.' + CONFIG.eMensaje, document.getElementById('msg').value);
+      fetch(CONFIG.formAction, { method: 'POST', mode: 'no-cors', body: datos })
+        .then(function(){ guardar(asisten); gracias(asisten.length); })
+        .catch(function(){
+          btn.disabled = false; btn.textContent = 'Confirmar';
+          document.getElementById('err').textContent = 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.';
+        });
+    }
+
+    function gracias(n){
+      var t = n === 0
+        ? '<div class="big">💛</div><p class="hola"><b>¡' + (plural ? 'Los' : 'Te') + ' vamos a extrañar!</b></p><p class="sub">Gracias por avisarnos.</p>'
+        : '<div class="big">🎉</div><p class="hola"><b>¡Gracias por confirmar!</b></p><p class="sub">' + (n === 1 ? 'Te esperamos' : 'Los esperamos') + ' en Tolú 🌅</p>' +
+          '<div class="cupo">🎟️ Confirmación válida para ' + n + (n === 1 ? ' persona' : ' personas') + '</div>';
+      app.innerHTML = cabecera() + '<div class="gracias">' + t + '</div>' +
+        '<div class="nota">✉️ Muy pronto ' + (plural ? 'recibirán' : 'recibirás') + ' la invitación formal con todos los detalles de la fiesta.</div>';
+      window.scrollTo({ top: app.offsetTop - 10, behavior: 'smooth' });
+    }
+    pintar();
+  }
+</script>
+</body>
+</html>
